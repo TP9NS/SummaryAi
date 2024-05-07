@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>도서 분석 어플리케이션</title>
+    <style>
+        /* 원래 페이지 스타일 */
+        body {
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            margin: 20px;
+            background-color: lightblue;
+        }
+
+        h1 {
+            font-family: 'TmoneyRoundWindExtraBold';
+            font-weight: bold;
+            font-size: 60px;
+            color: white;
+            text-align: center;
+        }
+
+        textarea {
+            width: 60%; /* 텍스트 필드의 너비 */
+            height: 680px; /* 텍스트 필드의 높이 */
+            resize: none; /* 사용자가 크기를 조정하지 못하도록 고정 */
+            margin-top: 20px;
+            border: 2px solid #4CAF50;
+            padding: 10px;
+        }
+
+        .slider-container {
+            width: 60%;
+            margin: 20px auto;
+            text-align: center;
+        }
+
+        .slider {
+            width: 80%;
+            height: 10px;
+            border-radius: 5px;
+            background: #d3d3d3;
+            outline: none;
+            opacity: 0.7;
+            transition: opacity .2s;
+            margin-bottom: 20px;
+        }
+
+        .slider:hover {
+            opacity: 1;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #E4EBF5;
+            cursor: pointer;
+        }
+
+        .slider::-moz-range-thumb {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #E4EBF5;
+            cursor: pointer;
+        }
+
+
+        /* 로그인, 회원가입 버튼 스타일 */
+        .login-btn,
+        .signup-btn {
+            width: 120px;
+            height: 40px;
+            background-color: #E4EBF5;
+            color: #333333;
+            border: 2px solid #E4EBF5;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+            margin: 5px;
+            transition-duration: 0.4s;
+            position: absolute;
+            top: 20px;
+        }
+
+        .login-btn {
+            right: 180px;
+        }
+
+        .signup-btn {
+            right: 20px;
+        }
+
+        .login-btn:hover,
+        .signup-btn:hover {
+            background-color: #4CAF50;
+            color: white;
+            border: 2px solid #4CAF50;
+        }
+
+        /* .no-file-selected-btn 스타일 */
+        .no-file-selected-btn {
+            width: 120px;
+            height: 40px;
+            background-color: #ccc;
+            color: #666;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+            display: inline-block;
+            text-decoration: none;
+            transition-duration: 0.4s;
+            margin-right: 10px;
+            line-height: 40px;
+        }
+
+        /* .no-file-selected-btn.active 스타일 */
+        .no-file-selected-btn.active {
+            background-color: #E4EBF5;
+            color: #333333;
+            border: 2px solid #E4EBF5;
+        }
+
+        /* .no-file-selected-btn:hover 스타일 */
+        .no-file-selected-btn:hover {
+            background-color: #4CAF50;
+            color: white;
+            border: 2px solid #4CAF50;
+        }
+
+        /* 파일 선택, 분석 시작 버튼 스타일 */
+        .file-btn,
+        .analyze-btn {
+            width: 120px;
+            height: 40px;
+            background-color: #ccc;
+            color: #666;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+            display: inline-block;
+            text-decoration: none;
+            transition-duration: 0.4s;
+            margin-right: 10px;
+            line-height: 40px;
+        }
+
+        .file-btn.active,
+        .analyze-btn.active {
+            background-color: #E4EBF5;
+            color: #333333;
+            border: 2px solid #E4EBF5;
+        }
+
+        .file-btn:hover,
+        .analyze-btn:hover {
+            background-color: #4CAF50;
+            color: white;
+            border: 2px solid #4CAF50;
+        }
+
+        /* .btn-container 스타일 */
+        .btn-container {
+            margin-top: 10px;
+        }
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.7);
+            z-index: 9999;
+        }
+
+        .loading-spinner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+            100% {
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
+        }
+    </style>
+
+    <!-- jQuery를 로드 -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script>
+        
+        $(document).ready(function () {
+            // 파일을 선택하면 자동으로 업로드
+            var username = $('#dan').val();
+
+            const slider = document.querySelector(".slider");
+            const sliderValue = document.getElementById("slider-value");
+
+            slider.addEventListener("input", function () {
+                sliderValue.textContent = this.value;
+                sliderValue.textContent = slider.value;
+            });
+
+
+
+          if (username !== 'None') {
+            $('#loginButton').text('사용자 ID: ' + username);
+            $('#signupButton').text('로그아웃');
+            $('#signupButton').click(function () {
+            
+            logoutFunction();
+        });
+          }
+            $('input[type="file"]').change(function () {
+                var fileName = $(this).val().split('\\').pop();
+                $('.text1').val(fileName);
+                
+                var formData = new FormData();
+                formData.append('file', $('input[type="file"]')[0].files[0]);
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/upload',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function (data) {
+                        //console.log(data);
+                        //$('.text1').val(data);
+                    },
+                    error: function (error) {
+                        console.log(error);
+                    }
+                });
+            });
+            
+            $('#signupButton').click(function () {
+                var usernameDisplayText = $('#signupButton').text().trim();
+                if (usernameDisplayText === "회원가입") {
+                    console.log('회원가입 창 열림')
+                    var signupWindow = window.open('/signup', 'signupWindow', 'width=500, height=450');
+                    function receiveMessage(event) {
+                        if (event.origin !== window.origin) return;
+                        if (event.data.type === '회원가입 성공') {
+                            signupWindow.close();
+                        }
+                    }
+                    window.addEventListener('message', receiveMessage);
+                }else if(usernameDisplayText !== "회원가입"){
+                    logoutFunction();
+                }
+            });
+             // 로그인 버튼 클릭 시 로그인 창 띄우기
+             $('#loginButton').click(function () {
+                var buttonText = $(this).text().trim();
+                if (buttonText === '로그인') {
+                    console.log("로그인 창 열림")
+                openLoginForm();
+                }
+            });
+
+            $('input[type="file"]').change(function () {
+                var fileName = $(this).val().split('\\').pop();
+                $('.text1').val(fileName);
+
+                if (fileName.toLowerCase().endsWith('.txt')) {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        $('.text1').val(e.target.result);
+                    };
+                    reader.readAsText(this.files[0]);
+                } else {
+                    $('.text1').val('');
+                }
+            });
+            $('.no-file-selected-btn').click(function () {
+                if (checkLoginStatus()) {
+                    console.log("파일 선택 창 열림")
+                    handleFileSelection();
+                }
+            });
+        });
+        function logoutFunction() {
+    $.ajax({
+        type: 'GET',
+        url: '/logout', // 로그아웃 요청을 보낼 엔드포인트
+        success: function (response) {
+            console.log("로그아웃")
+            $('#signupButton').text('회원가입');
+            $('#loginButton').text('로그인');
+        },
+        error: function (error) {
+            // 로그아웃 요청이 실패한 경우 처리할 내용을 작성하세요.
+            console.log(error);
+        }
+    });
+}
+
+            function handleFileSelection() {
+                document.getElementById('fileInput').click();
+                console.log("파일 선택 됌")
+            }
+        
+            // 분석 시작 버튼 클릭 시 분석 결과 페이지로 이동
+
+            function checkLoginStatus() {
+                var usernameDisplayText = $('#signupButton').text().trim();
+                if (!(usernameDisplayText === "회원가입")) {
+                    return true;
+                }
+                alert("로그인이 필요합니다. 서비스를 이용하려면 먼저 로그인하세요.");
+                    return false;
+            }
+
+
+            function openLoginForm() {
+                var loginWindow = window.open("/login", "loginWindow", "width=500, height=450");
+                $.ajax({
+                    type: 'GET',
+                    url: '/login',
+                    success: function (response) {
+                        loginWindow.document.open();
+                        loginWindow.document.write(response);
+                        loginWindow.document.close();
+                    },
+                    error: function (error) {
+                        console.log(error);
+                    }
+                });
+
+                function receiveMessage(event) {
+                    if (event.origin !== window.origin) return;
+                    if (event.data.type === '로그인 성공') {
+                        console.log("로그인 성공")
+                        var username = event.data.username;
+                        
+                        loginWindow.close();
+                    }
+                }
+
+                window.addEventListener('message', receiveMessage, false);
+            }
+
+           
+       
+            function startAnalysis() {
+    if (checkLoginStatus()) {
+        var fileContent = $('.text1').val(); // 페이지에 로드된 textarea의 내용을 가져옴
+        if (fileContent.trim() === '') {
+                    alert('텍스트를 입력하세요.'); // 분석할 내용이 비어있을 경우 경고창 표시
+                    return;
+        }        
+        showLoading()
+        const slider = document.querySelector(".slider");
+        // 페이지에 로드된 textarea의 내용을 서버로 전송
+        $.ajax({
+            type: 'POST',
+            url: '/analyze',
+            data: { content: fileContent,
+                    sliderValue: slider.value  }, // textarea의 내용을 content로 전송
+            success: function (data) {
+                console.log(data);
+                hideLoading()
+                window.location.href = '/result'; // 분석 결과 표시 페이지로 이동
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        });
+    }
+    }
+
+function showLoading() {
+            document.getElementById('loadingOverlay').style.display = 'block';
+            console.log("로딩 시작")
+        }
+
+        // 로딩 숨기는 함수
+        function hideLoading() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+            console.log("로딩 종료")
+        }
+    </script>
+</head>
+
+<body>
+    <input type="hidden" id="dan" value="{{ username }}">
+    <h1>텍스트 요약 봇</h1>
+
+    <!-- 로그인, 회원가입 버튼 -->
+    <div class="btn-container">
+        <button id="loginButton" class="login-btn">로그인</button>
+        <p id="usernameDisplay" style="display: none;"></p>
+        <button id="signupButton" class="signup-btn">{{ '사용자 ID: '+username if username else '회원가입' }}</button>
+    </div>
+
+    <!-- 파일 선택 후 파일 이름을 표시하는 textarea -->
+    <div>
+        <textarea rows="10" class="text1 no-file-selected">{{ content }}</textarea>
+    </div>
+
+    <div class="slider-container">
+        <input type="range" min="0" max="100" value="50" class="slider">
+        <p>요약 정도: <span id="slider-value">50</span></p>
+    </div>
+
+    <!-- 파일 선택 버튼과 분석 시작 버튼 -->
+    <div class="btn-container">
+        <div class="no-file-selected-btn active">
+            파일 선택
+            <input type="file" name="file" id="fileInput" style="display: none;">
+        </div>
+
+        <div class="analyze-btn active" onclick="startAnalysis();" {% if not _login %}disabled{% endif %}>
+            분석 시작
+        </div>
+        
+    </div>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+</body>
+
+</html>

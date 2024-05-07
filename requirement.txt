@@ -1,0 +1,61 @@
+개발 환경
+Python : 3.8.17버전
+실행 환경
+VScode
+---------------------
+실행 준비
+---------------------
+설치할 패키지
+pip install konlpy
+pip install scikit-learn
+pip install numpy
+pip install networkx
+pip install Flask
+pip install chardet
+pip install mysql-connector-python
+pip install matplotlib
+pip install pillow
+pip install collections
+---------------------
+
+데이터베이스 
+MYSQL 8.0.34
+mysql workbench
+IP주소: 127.0.0.1 포트번호는 3306인 SQL Connection을 생성
+
+CREATE TABLE user (
+id varchar(30) primary key,
+passwd varchar(30),
+name varchar(30),
+birth varchar(30),
+email varchar(30))
+명령어로 테이블 생성
+
+
+SQL Connection을 만들때 썻던 계정과 비밀번호를 34번째 줄 user와 35번째 줄 password 변수에 입력
+
+---------------------
+실행 시 JDK 필요
+JDK 환경 변수 설정 방법
+1. 윈도우 키를 누르고 '환경 변수' 를 입력
+2. 시스템 환경 변수 편집 을 클릭
+3. 시스템 변수에 JAVA_HOME이라는 변수를 생성 후 jdk 경로 설정
+
+---------------------
+실행
+---------------------
+main.py 실행
+
+http://127.0.0.1:5000/ 접속
+
+회원가입에서 아이디를 만든 후 로그인 해야 서비스 이용가능
+다음 파일을 선택하거나 문구를 입력한 뒤 요약 정도를 조절하고 분석을 시작
+(요약 정도는 낮을 수록 더 짧은 결과를 내림)
+
+주제,스토리요약이 출력된다.
+next버튼을 누르면 상세 분석 페이지로 넘어가며
+단어 수,문장 수,대사 수 가 보여지고 
+많이 나오는 명사 상위 5개,불용어 상위 5개 가 파이차트와 바 차트로 출력된다.
+뒤로 가기 버튼으로 분석 페이지로 이동 가능, 메인페이지로 이동가능
+
+

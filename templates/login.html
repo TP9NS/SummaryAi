@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>로그인</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+            padding: 0;
+            background-color: lightblue;
+            overflow-y: scroll;
+        }
+
+        .login-container {
+            width: 270px;
+            margin: 100px auto;
+            margin-top: 100px;
+            border: 2px solid #ccc;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: white;
+        }
+
+        .login-container input[type="text"],
+        .login-container input[type="password"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .login-container button {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+
+        .login-container button:hover {
+            background-color: #0056b3;
+        }
+
+        
+
+        .search button {
+            width: 48%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: initial;
+            color: #007bff;
+            cursor: pointer;
+            border-bottom: 1px solid transparent;
+            text-decoration: none; /* 밑줄 제거 */
+        }
+
+        .search button:hover {
+            background-color: initial;
+            
+            text-decoration: underline; /* 마우스 오버시 밑줄 표시 */
+        }
+
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script>
+        function submitLogin() {
+            var username = document.querySelector('.login-container input[type="text"]').value;
+            var password = document.querySelector('.login-container input[type="password"]').value;
+
+            // 서버로 로그인 정보 전송
+            $.ajax({
+                type: 'POST',
+                url: '/login/submit',
+                data: {username: username, password: password},
+                success: function(response) {
+                    window.opener.postMessage({ type: '로그인 성공', username: username }, window.opener.origin);
+                    console.log(`사용자명: ${username}, 비밀번호: ${password}`);
+                    alert(`로그인 성공: ${username}`);
+                    $('#loginButton', window.opener.document).text('사용자 ID: ' + username);
+                    $('#signupButton', window.opener.document).text('로그아웃');
+                     
+                },
+                error: function(error) {
+                    console.log(error);
+                    alert(`아이디 또는 비밀번호를 확인하세요.`);
+                }
+            });
+        }
+
+        function openIdRecoveryForm() {
+            var idRecoveryWindow = window.open("/id_recovery", "idRecoveryWindow", "width=500, height=450");
+            // 여기에 필요한 처리를 추가할 수 있습니다.
+        }
+
+        function openPasswordRecoveryForm() {
+            var passwordRecoveryWindow = window.open("/password_recovery", "passwordRecoveryWindow", "width=500, height=450");
+            // 여기에 필요한 처리를 추가할 수 있습니다.
+        }
+    </script>
+</head>
+<body>
+    <div class="login-container">
+        <h2>로그인</h2>
+        <input type="text" placeholder="아이디"><br>
+        <input type="password" placeholder="비밀번호"><br>
+        <button onclick="submitLogin()">로그인</button>
+
+        <div class="search">
+            <button id="idRecoveryButton" onclick="openIdRecoveryForm()">아이디 찾기</button>
+            <button id="passwordRecoveryButton" onclick="openPasswordRecoveryForm()">비밀번호 찾기</button>
+        </div>
+    </div>
+</body>
+</html>

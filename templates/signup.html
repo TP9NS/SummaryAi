@@ -1,0 +1,206 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>회원가입</title>
+    <style>
+        /* 회원가입 폼 스타일 */
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+            padding: 0;
+            background-color: lightblue;
+            overflow-y: scroll;
+        }
+
+        .signup-container {
+            width: 270px;
+            margin: 100px auto;
+            margin-top: 100px;
+            border: 2px solid #ccc;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: white;
+        }
+
+        /* 아이디, 이메일 입력 칸 */
+        .signup-container input[type="text"]{
+            width: calc(56% - 1px);
+            padding: 10px;
+            margin: 10px 2px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .signup-container input[type="email"] {
+            width: calc(40% - 12px);
+            padding: 10px;
+            margin: 10px 2px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .signup-container input[type="dotext"] {
+            width: calc(40% - 12px);
+            padding: 10px;
+            margin: 10px 2px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        /* 변경된 입력 칸 */
+        .signup-container input[type="password"],
+        .signup-container input[type="name"][placeholder="이름"],
+        .signup-container input[type="date"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        /* 중복 확인 버튼 스타일 */
+        .signup-container input[type="button"] {
+            width: calc(30% - 2px);
+            padding: 10px;
+            margin: 10px 2px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+
+        /* 이메일 입력과 도메인 선택을 같은 줄에 배치 */
+        .email-and-dotext {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        
+        /* 도메인 선택 스타일 */
+        .signup-container select {
+            width: calc(100% - 8px);
+            padding: 10px;
+            margin: 10px 2px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        /* 도메인 선택과 직접 입력 토글링 */
+        #emailDomains[type="checkbox"]:checked ~ .direct-input {
+            display: block;
+        }
+        .signup-button {
+        width: calc(50% - 2px);
+        padding: 10px;
+        margin: 10px 2px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: #007bff;
+        color: white;
+        cursor: pointer;
+    }
+    </style>
+</head>
+<body>
+    <div class="signup-container">
+        <h2>회원가입</h2>
+        <div class="button-and-domain">
+            <input id='id' type="text" placeholder="아이디">
+            <input type="button" onclick="checkDuplicate()" value="중복 확인">
+        </div>
+        <!-- 변경된 크기 -->
+        <input type="password" placeholder="비밀번호"><br>
+        <input type="name" placeholder="이름"><br>
+        <input type="date"><br>
+        <div class="email-and-domain">
+            <input type="email" placeholder="이메일">
+            <span class="at-symbol">@</span>
+            <input type="dotext" placeholder="직접 입력">
+            
+            <select>
+                <option value="">도메인 선택</option>
+                <option value="gmail.com">gmail.com</option>
+                <option value="naver.com">naver.com</option>
+                <option value="yahoo.com">yahoo.com</option>
+                <!-- 필요한 도메인 계속해서 추가 -->
+            </select>
+        </div>
+        <button onclick="submitSignup()"class="signup-button">회원가입</button>
+    </div>
+
+    <!-- jQuery 로드 -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script>
+        // 이메일 도메인 선택 시 값 채우기
+        $('select').change(function() {
+            var domain = $(this).val();
+            var emailInput = $('input[type="dotext"]');
+            emailInput.val(domain);
+        });
+
+        function submitSignup() {
+        var id = document.querySelector('.signup-container input[type="text"]').value;
+        var password = document.querySelector('.signup-container input[type="password"]').value;
+        var name = document.querySelector('.signup-container input[type="name"]').value;
+        var email = document.querySelector('.signup-container input[type="email"]').value;
+        var domain = document.querySelector('.signup-container select').value;
+        var emailCustom = document.querySelector('.signup-container input[type="dotext"]').value; 
+        var date = document.querySelector('.signup-container input[type="date"]').value;
+        var fullEmail = email + "@" + (domain === "" ? emailCustom : domain); // 이메일과 도메인 합치기
+        var url = '/signup_process';
+        var data = {
+            'id': id,
+            'password': password,
+            'name': name,
+            'email': fullEmail,
+            'date' : date
+        };
+        if (id && password && name && email && date) {
+        $.ajax({
+            type: 'POST',
+            url: url,
+            contentType: 'application/json;charset=UTF-8',
+            data: JSON.stringify(data),
+            success: function (response) {
+                if (response.success) {
+                    alert('회원가입 성공!');
+                    window.opener.postMessage({ type: '회원가입 성공'}, window.opener.origin);
+                } else {
+                    alert('회원가입 실패!');
+                }
+            },
+            error: function () {
+                alert('ID 중복확인을 해주세요.');
+            }
+        });
+        }else {
+            alert('모든 정보를 입력하세요.');
+        }
+    }
+        function checkDuplicate() {
+    var id = document.getElementById('id').value;
+    var url = '/check_duplicate';
+    var data = { 'username': id };
+            
+    $.ajax({
+        type: 'POST',
+        url: url,
+        contentType: 'application/json;charset=UTF-8',
+        data: JSON.stringify(data),
+        success: function (response) {
+            if (response.isDuplicate) {
+                alert('아이디가 중복되었습니다. 다른 아이디를 입력하세요.');
+            } else {
+                alert('중복 확인 성공!');
+            }
+        },
+        error: function () {
+            alert('서버 오류가 발생했습니다.');
+        }
+    });
+}
+    </script>
+</body>
+</html>
